@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: dtwye-vjtkd
+created: 2025-04-20T22:20:14+08:00
