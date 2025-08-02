@@ -1,0 +1,93 @@
+{
+  "is_obsidian_vault": true,
+  "smart_blocks": {
+    "embed_blocks": true,
+    "min_chars": 100
+  },
+  "smart_sources": {
+    "single_file_data_path": ".smart-env/smart_sources.json",
+    "min_chars": 100,
+    "embed_model": {
+      "adapter": "transformers",
+      "transformers": {
+        "legacy_transformers": false,
+        "model_key": "TaylorAI/bge-micro-v2"
+      },
+      "TaylorAI/bge-micro-v2": {},
+      "openai": {
+        "model_key": "text-embedding-ada-002"
+      },
+      "text-embedding-3-small": {},
+      "text-embedding-ada-002": {}
+    },
+    "smart_change": {
+      "active": true
+    },
+    "expanded_view": true,
+    "smart_view_filter": {
+      "expanded_view": true
+    }
+  },
+  "file_exclusions": "Untitled",
+  "folder_exclusions": "smart-chats",
+  "smart_view_filter": {
+    "render_markdown": true,
+    "show_full_path": true,
+    "expanded_view": false,
+    "results_limit": "20"
+  },
+  "excluded_headings": "",
+  "language": "en",
+  "new_user": true,
+  "re_import_wait_time": 13,
+  "smart_chat_threads": {
+    "chat_model": {
+      "adapter": "ollama",
+      "ollama": {}
+    },
+    "active_thread_key": "",
+    "system_prompt": "",
+    "detect_self_referential": true,
+    "review_context": true,
+    "stream": true,
+    "language": "en",
+    "modifier_key_to_send": "shift",
+    "use_tool_calls": true
+  },
+  "smart_notices": {
+    "muted": {
+      "done_import": true,
+      "embedding_complete": true,
+      "import_progress": true,
+      "done_initial_scan": true
+    }
+  },
+  "version": "",
+  "smart_threads": {
+    "chat_model": {
+      "adapter": "custom",
+      "openai": {
+        "model_key": "gpt-4o"
+      },
+      "custom": {
+        "api_adapter": "openai",
+        "id": "deepseek-chat",
+        "protocol": "https",
+        "hostname": "api.deepd",
+        "port": 443,
+        "path": "/chat/completions",
+        "streaming": true,
+        "max_input_tokens": 1000,
+        "api_key": "sk-4ea712b8e13148df919a6e3ed63d5430"
+      }
+    },
+    "embed_model": {
+      "model_key": "None"
+    },
+    "language": "zh",
+    "review_context": false,
+    "lookup_limit": "10",
+    "send_tool_output_in_user_message": true
+  },
+  "expanded_view": true
+}
