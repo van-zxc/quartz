@@ -1,3 +1,114 @@
 @use "./base.scss";
 
-// put your custom CSS here!
+:root {
+  /* 定义Callout基础变量 */
+  --callout-border-width: 4px;
+  --callout-border-opacity: 0.8;
+  --callout-bg-opacity: 0.15;
+  --callout-radius: 6px;
+  --callout-padding: 12px 16px;
+  --callout-title-size: 1em;
+  --callout-title-weight: 600;
+  --callout-content-spacing: 8px;
+
+  /* 各Callout颜色定义 */
+  --definition-color: 60, 120, 200;    /* 蓝色 */
+  --theorem-color: 210, 80, 120;       /* 红色 */
+  --lemma-color: 160, 90, 180;         /* 紫色 */
+  --example-color: 30, 150, 100;        /* 绿色 */
+  --corollary-color: 220, 150, 50;     /* 橙色 */
+  --proof-color: 40, 170, 170;         /* 青色 */
+  --remark-color: 100, 100, 100;       /* 灰色 */
+}
+
+/* 通用Callout样式 */
+.callout {
+  border-radius: var(--callout-radius);
+  padding: var(--callout-padding);
+  margin: 1em 0;
+  border-left: var(--callout-border-width) solid;
+  background-color: rgba(var(--callout-color), var(--callout-bg-opacity));
+}
+
+.callout-title {
+  font-size: var(--callout-title-size);
+  font-weight: var(--callout-title-weight);
+  color: rgb(var(--callout-color));
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.callout-title-inner {
+  margin-right: 0.5em;
+}
+
+.callout-content {
+  margin-top: var(--callout-content-spacing);
+}
+
+/* 定义Callout */
+.callout[data-callout="definition"] {
+  --callout-color: var(--definition-color);
+  --callout-icon: lucide-book-open;
+}
+
+/* 定理Callout */
+.callout[data-callout="theorem"] {
+  --callout-color: var(--theorem-color);
+  --callout-icon: lucide-flame;
+}
+
+/* 引理Callout */
+.callout[data-callout="lemma"] {
+  --callout-color: var(--lemma-color);
+  --callout-icon: lucide-link;
+}
+
+/* 例题Callout */
+.callout[data-callout="example"] {
+  --callout-color: var(--example-color);
+  --callout-icon: lucide-lightbulb;
+}
+
+/* 推论Callout */
+.callout[data-callout="corollary"] {
+  --callout-color: var(--corollary-color);
+  --callout-icon: lucide-arrow-right-circle;
+}
+
+/* 注Callout */
+.callout[data-callout="remark"] {
+  --callout-color: var(--remark-color);
+  --callout-icon: lucide-info;
+}
+
+/* 证明Callout - 特殊样式 */
+.callout[data-callout="proof"] {
+  --callout-color: var(--proof-color);
+  --callout-icon: lucide-pen-line;
+  position: relative;
+}
+
+.callout[data-callout="proof"]::after {
+  content: "∎"; /* Q.E.D.符号 */
+  position: absolute;
+  bottom: 10px;
+  right: 16px;
+  color: rgba(var(--callout-color), 0.6);
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+/* 为所有Callout添加图标 */
+.callout[data-callout] .callout-title::before {
+  content: var(--callout-icon);
+  font-family: "Lucide";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
