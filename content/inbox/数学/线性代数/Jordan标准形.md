@@ -82,8 +82,125 @@ $$
 1. 假设$a\neq0$, 则该Jordan矩阵必然可被$m$次开根号. 
 2. 当$n\geq2$时, $J_{n}(0)$无法开根. 
 
+### 求解[[常系数线性微分方程]]组
+
+不妨假设$n$阶微分方程组形式为
+$$
+\frac{\mathrm{d}}{\mathrm{d}x^{n}}f_{1} - a_{n-1}\frac{\mathrm{d}}{\mathrm{d}x^{n-1}}f_{1} - \dots - a_{1} \frac{\mathrm{d}}{\mathrm{d}x}f_{1} = b f_{1}
+$$
+我们令$f_{2}=\frac{\mathrm{d}}{\mathrm{d}x}f_{1},\dots$, 于是可以改写为
+$$
+\frac{\mathrm{d}}{\mathrm{d}x}\begin{pmatrix}
+f_{1} \\
+f_{2} \\
+\vdots \\
+f_{n}
+\end{pmatrix}
+= \begin{pmatrix}
+0 & 1 & 0 & \dots & 0 \\
+0 & 0 & 1 & \dots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+b & a_{1} & a_{2} & \dots & a_{n-1}
+\end{pmatrix}
+\begin{pmatrix}
+f_{1} \\
+f_{2} \\
+\vdots \\
+f_{n}
+\end{pmatrix} = 
+C\begin{pmatrix}
+f_{1} \\
+f_{2} \\
+\vdots \\
+f_{n}
+\end{pmatrix} 
+$$
+我们不妨将其转换为Jordan标准形: $PCP^{-1}=J$, 且令
+$$
+P^{-1}\begin{pmatrix}
+f_{1} \\
+f_{2} \\
+\vdots \\
+f_{n}
+\end{pmatrix} = 
+\begin{pmatrix}
+g_{1} \\
+g_{2} \\
+\vdots \\
+g_{n}
+\end{pmatrix} 
+$$
+则有
+$$
+\frac{\mathrm{d}}{\mathrm{d}x}
+\begin{pmatrix}
+g_{1} \\
+g_{2} \\
+\vdots \\
+g_{n}
+\end{pmatrix}
+=
+J\begin{pmatrix}
+g_{1} \\
+g_{2} \\
+\vdots \\
+g_{n}
+\end{pmatrix}
+$$
+如果说是[[对角矩阵]], 则可以直接解耦. 若不是, 则可以按照各个分量展开, 挨个求, 不难. 
+
+### 求数列通项方程
+
+我们不妨先考虑一下简单一点的方程: 
+$$
+a_{n+1}=k_{1}a_{n}+k_{2}a_{n-1}\implies \begin{pmatrix}
+a_{n} \\
+a_{n+1}
+\end{pmatrix}
+=\begin{pmatrix}
+0 & 1 \\
+k_{2} & k_{1}
+\end{pmatrix}
+\begin{pmatrix}
+a_{n-1} \\
+a_{n}
+\end{pmatrix}
+\implies
+\begin{pmatrix}
+a_{n} \\
+a_{n+1}
+\end{pmatrix}
+=A
+\begin{pmatrix}
+a_{n-1} \\
+a_{n}
+\end{pmatrix}
+$$
+我们可以求该矩阵的特征值, 有$A\mathbf{x}=\lambda \mathbf{x}$. 即有
+$$
+\det(A-\lambda I)=0 \implies \begin{vmatrix}
+-\lambda & 1 \\
+k_{2} & k_{1}-\lambda
+\end{vmatrix}=0
+\implies
+\lambda^{2}-k_{1}\lambda-k_{2}=0
+$$
+就是我们之前的特征方程. 解得特征值为$\lambda_{1},\lambda_{2}$. 
+
+在该条件下, 该特征矩阵相似的对角矩阵为$\Lambda=\begin{pmatrix}\lambda_{1}&\\&\lambda_{2}\end{pmatrix}$. 对应特征向量为$v_{1}=(1,\lambda_{1}),v_{2}=(1,\lambda_{2})$因此进行$n$次映射操作后, 映射矩阵即为$\Lambda^{n}=\begin{pmatrix}\lambda_{1}^{n}&\\&\lambda_{2}^{n}\end{pmatrix}$. 不妨假设$(a_{1},a_{2})=c_{1}v_{1}+c_{2}v_{2}$, 则$\Lambda^{n}\begin{pmatrix}c_{1}\\ c_{2}\end{pmatrix}=\begin{pmatrix}a_{n}\\ a_{n+1}\end{pmatrix}$. 可以解得$a_{n}=c_{1}\lambda_{1}^{n}+c_{2}\lambda_{2}^{n}$. 
+
+高次递推方程形式类似, 可以通过同样的构造特征根的方式求得特征根. 
+
+该推导方法必须要求没有重根, 若是存在重根, 则不可能对角化, 只能进行Jordan标准形化. 直接写结论$\sum\limits_{i=1}^{m} c_{i}\begin{pmatrix}n\\ i-1\end{pmatrix}\lambda^{n-i+1}_{0}$
+
 # 相对一般的证明方法
 
 1. 证明结论对于若当块成立；
 2. 证明结论对于若当标准形成立；
 3. 利用问题在相似下的不变性证明结论对于一般矩阵成立.
+
+通过此方法可以证明著名的[[Jordan-Chevalley分解]]
+
+$$
+\left( \frac{a^{\alpha}+b^{\alpha}}{2} \right)^{1/\alpha}
+$$
