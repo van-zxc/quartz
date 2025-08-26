@@ -30,9 +30,8 @@ $$
 
 Add: 
 >[!definition] 定义
->$$
->G_{j}(\sigma,\lambda)=ker\ N^{j}
->$$
+>$G_{j}(\sigma,\lambda)=ker\ N^{j}$
+>$J_{n}(a)$表示特征值为$a$的n阶Jordan块
 
 # 唯一性
 
@@ -201,6 +200,3 @@ $$
 
 通过此方法可以证明著名的[[Jordan-Chevalley分解]]
 
-$$
-\left( \frac{a^{\alpha}+b^{\alpha}}{2} \right)^{1/\alpha}
-$$
