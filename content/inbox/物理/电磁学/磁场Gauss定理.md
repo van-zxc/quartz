@@ -5,6 +5,7 @@
 我们类比[[静电场Gauss定理]], 可以通过类似的[[散度]]高斯定理来描述磁场的散度. 
 
 即: 通过磁场任何一个闭合曲面的总磁通量为0. 
+
 $$
 \underset{ S \;}{ {\rlap{\mspace{1mu} \boldsymbol{\bigcirc}}{\rlap{\int}{\;\int}}} } \ \mathbf{B} \cdot \mathrm{d} \mathbf{S} = 0
 $$
