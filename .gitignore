@@ -9,3 +9,7 @@ tsconfig.tsbuildinfo
 private/
 .replit
 replit.nix
+
+# Generated website build files
+/.publish-content/
+/.publication-report.json

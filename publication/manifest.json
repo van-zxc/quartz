@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "notes": [
+    {
+      "source": "inbox/数学/概率论/古典概率.md",
+      "output": "数学/概率论/古典概率.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/概率论/二项分布.md",
+      "output": "数学/概率论/二项分布.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/概率论/超几何分布.md",
+      "output": "数学/概率论/超几何分布.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/概率论/全概率公式.md",
+      "output": "数学/概率论/全概率公式.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/概率论/指数分布.md",
+      "output": "数学/概率论/指数分布.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/线性代数/线性子空间.md",
+      "output": "数学/线性代数/线性子空间.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/线性代数/线性组合.md",
+      "output": "数学/线性代数/线性组合.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/数学/线性代数/矩阵的迹.md",
+      "output": "数学/线性代数/矩阵的迹.md",
+      "topic": "数学"
+    },
+    {
+      "source": "inbox/物理/电磁学/ohm定律.md",
+      "output": "物理/电磁学/ohm定律.md",
+      "topic": "物理",
+      "title": "欧姆定律"
+    },
+    {
+      "source": "inbox/物理/电磁学/自感.md",
+      "output": "物理/电磁学/自感.md",
+      "topic": "物理"
+    },
+    {
+      "source": "inbox/物理/电磁学/变压器.md",
+      "output": "物理/电磁学/变压器.md",
+      "topic": "物理"
+    },
+    {
+      "source": "inbox/物理/电磁学/电场强度.md",
+      "output": "物理/电磁学/电场强度.md",
+      "topic": "物理"
+    },
+    {
+      "source": "inbox/化学/有机化学/有机化学的命名.md",
+      "output": "化学/有机化学/有机化学的命名.md",
+      "topic": "化学"
+    },
+    {
+      "source": "inbox/化学/平衡通论/沉淀平衡.md",
+      "output": "化学/平衡通论/沉淀平衡.md",
+      "topic": "化学"
+    },
+    {
+      "source": "inbox/生物科学/细胞生物学/细胞膜.md",
+      "output": "生物科学/细胞生物学/细胞膜.md",
+      "topic": "生物科学"
+    },
+    {
+      "source": "inbox/生物科学/宏观生物学/裸子植物.md",
+      "output": "生物科学/宏观生物学/裸子植物.md",
+      "topic": "生物科学"
+    }
+  ]
+}

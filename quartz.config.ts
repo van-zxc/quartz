@@ -8,16 +8,31 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Quartz 4",
+    pageTitle: "我的大学知识库",
     pageTitleSuffix: "",
     enableSPA: true,
     enablePopovers: true,
-    analytics: {
-      provider: "plausible",
-    },
-    locale: "en-US",
-    baseUrl: "quartz.jzhao.xyz",
-    ignorePatterns: ["private", "templates", ".obsidian"],
+    analytics: null,
+    locale: "zh-CN",
+    baseUrl: "van-zxc.github.io/quartz",
+    ignorePatterns: [
+      "private",
+      "templates",
+      ".obsidian",
+      "模板/**",
+      "文献摘录/**",
+      "阅读笔记/文献/**",
+      "灵感/**",
+      "attachment/文献/**",
+      "attachment/Flomo/**",
+      "attachment/电子书/**",
+      "书籍摘录/**",
+      "书籍/**",
+      "项目/资料入库待确认.md",
+      "资料工作流导航.md",
+      "工作流使用说明.md",
+      "项目/工作流试用.md",
+    ],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",
@@ -73,7 +88,7 @@ const config: QuartzConfig = {
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
     ],
-    filters: [Plugin.RemoveDrafts()],
+    filters: [Plugin.RemoveDrafts(), Plugin.ExplicitPublish()],
     emitters: [
       Plugin.AliasRedirects(),
       Plugin.ComponentResources(),
@@ -84,12 +99,11 @@ const config: QuartzConfig = {
         enableSiteMap: true,
         enableRSS: true,
       }),
-      Plugin.Assets(),
       Plugin.Static(),
       Plugin.Favicon(),
       Plugin.NotFoundPage(),
       // Comment out CustomOgImages to speed up build time
-      Plugin.CustomOgImages(),
+      // 首批文字笔记使用默认分享图，避免构建依赖外部字体服务。
     ],
   },
 }
