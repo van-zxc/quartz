@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '45 1 * * *' # 每天北京时间 09:45
   workflow_dispatch:
 
 permissions:
@@ -28,7 +30,7 @@ jobs:
       - name: 安装依赖
         run: npm ci
       - name: 检查发布范围
-        run: node --test scripts/publication.test.mjs
+        run: node --test scripts/publication.test.mjs scripts/sync-publication.test.mjs
       - name: 导出四科全部笔记
         run: node scripts/publication.mjs
       - name: 构建网站
