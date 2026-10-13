@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process"
 import { createHash } from "node:crypto"
 import { publicationSlug } from "./paths.mjs"
 import { compatibleMath } from "./math-compatibility.mjs"
+import { normalizeDisplayMath, preserveUnrenderableMath } from "./full-math.mjs"
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 export const generated = ".publish-content"
@@ -66,7 +67,7 @@ export function validateRaster(bytes, source) {
   if (!valid || bytes.length > 10 * 1024 * 1024) throw new Error(`附件不是受支持的图片或超过10MB: ${source}`)
 }
 
-export function transformBody(body, source, published, changes, assets = []) {
+export function transformBody(body, source, published, changes, assets = [], full = false) {
   const tree = unified().use(remarkParse).use(remarkGfm).use(remarkMath).parse(body)
   const protectedSpans = []
   const edits = []
@@ -82,6 +83,8 @@ export function transformBody(body, source, published, changes, assets = []) {
       throw new Error(`需要审查嵌入的 HTML: ${source}`)
     if (node.type === "imageReference") throw new Error(`需要审查引用式图片: ${source}`)
     if (node.type === "image") {
+      // A wiki transclusion followed by parentheses is not a Markdown image.
+      if (body.slice(node.position.start.offset,node.position.end.offset).startsWith("![[")) return
       const asset = usedAsset(decodeURIComponent(node.url))
       edits.push([node.position.start.offset, node.position.end.offset, `![${node.alt || "配图"}](${asset.output})`])
     }
@@ -110,11 +113,12 @@ export function transformBody(body, source, published, changes, assets = []) {
       edits.push([start, start + match[0].length, replacement]); continue
     }
     const target = name === "" ? published.find((e) => e.source === source) : resolveTarget(name, source, published)
-    if (match[1] && !target) throw new Error(`正文嵌入目标未公开: ${source}: ${name}`)
+    if (match[1] && !target && !full) throw new Error(`正文嵌入目标未公开: ${source}: ${name}`)
     const label = alias ?? path.posix.basename(name || source.replace(/\.md$/, ""))
-    const replacement = target
+    let replacement = target
       ? `${match[1]}[[${target.output.slice(0, -3)}${anchor ? "#" + anchor : ""}${alias ? "|" + alias : ""}]]`
-      : label
+      : (match[1] ? `引用：${label}` : label)
+    if (match[1] && target && body[start + match[0].length] === "(") replacement += "\n\n"
     if (!target) changes.push({source, target: name, label})
     edits.push([start, start + match[0].length, replacement])
   }
@@ -125,12 +129,70 @@ export function transformBody(body, source, published, changes, assets = []) {
   return body
 }
 
+export const publicationFolders = ["inbox/数学", "inbox/物理", "inbox/化学", "inbox/生物科学"]
+
+export async function refreshFolderManifest(repo, manifest) {
+  if (manifest.folders?.length !== publicationFolders.length || publicationFolders.some(f => !manifest.folders.includes(f)))
+    throw new Error("全量发布仅允许指定的四个学科文件夹")
+  const content = path.join(repo, "content")
+  const files = []
+  const pictures = []
+  async function walk(relative, collection, notes) {
+    const absolute = safePath(content, relative)
+    for (const item of await fs.readdir(absolute, {withFileTypes:true})) {
+      if (item.name.startsWith(".")) continue
+      if (item.isSymbolicLink()) throw new Error("发布范围不能包含符号链接")
+      const next = path.posix.join(relative,item.name)
+      if (item.isDirectory()) await walk(next,collection,notes)
+      else if (item.isFile() && (notes ? next.endsWith(".md") : /\.(png|jpe?g|gif|webp)$/i.test(next))) collection.push(next)
+    }
+  }
+  for (const folder of publicationFolders) await walk(folder,files,true)
+  // Enumerate attachment metadata only; read bytes only for directly referenced images.
+  async function attachmentNames(relative = "") {
+    const dir = relative ? safePath(path.join(content,"attachment"),relative) : path.join(content,"attachment")
+    for (const item of await fs.readdir(dir,{withFileTypes:true})) {
+      if (item.name.startsWith(".") || ["文献","Flomo","电子书"].includes(item.name)) continue
+      if (item.isSymbolicLink()) continue
+      const next = path.posix.join(relative,item.name)
+      if (item.isDirectory()) await attachmentNames(next)
+      else if (item.isFile() && /\.(png|jpe?g|gif|webp)$/i.test(next)) pictures.push({source:"attachment/"+next,output:"assets/"+createHash("sha256").update("attachment/"+next).digest("hex").slice(0,16)+path.posix.extname(next).toLowerCase()})
+    }
+  }
+  await attachmentNames()
+  const notes = files.sort().map(source => ({source,output:source.slice(6),topic:source.split("/")[1],...(manifest.notes.find(n=>n.source===source)?.title ? {title:manifest.notes.find(n=>n.source===source).title} : {})}))
+  const used = new Set()
+  for (const note of notes) {
+    const parsed = matter(await readSource(content,note.source))
+    const raw = parsed.content
+    const names = [...raw.matchAll(/!\[\[([^\]\n]+)\]\]/g)].map(m=>m[1].split(/\\?\|/)[0].split("#")[0])
+    const tree = unified().use(remarkParse).use(remarkMath).parse(raw)
+    visit(tree,"image",node=>{if (!raw.slice(node.position.start.offset,node.position.end.offset).startsWith("![[")) names.push(decodeURIComponent(node.url))})
+    for (const name of names.filter(n=>/\.(png|jpe?g|gif|webp)$/i.test(n))) {
+      const asset = resolveTarget(name,note.source,pictures)
+      if (!asset) throw new Error(`找不到引用的配图: ${note.source}: ${name}`)
+      used.add(asset.source)
+    }
+  }
+  const assets = []
+  for (const asset of pictures.filter(p=>used.has(p.source)).sort((a,b)=>a.source.localeCompare(b.source))) {
+    const bytes = await readSource(path.join(content,"attachment"),asset.source.slice(11),null)
+    validateRaster(bytes,asset.source)
+    assets.push({...asset,sha256:createHash("sha256").update(bytes).digest("hex")})
+  }
+  const refreshed = {...manifest,notes,assets}
+  await fs.writeFile(path.join(repo,"publication/manifest.json"),JSON.stringify(refreshed,null,2)+"\n")
+  return refreshed
+}
+
 export async function prepare(repo = root) {
-  const manifest = JSON.parse(
+  let manifest = JSON.parse(
     await fs.readFile(path.join(repo, "publication/manifest.json"), "utf8"),
   )
-  if (manifest.version !== 1 || !Array.isArray(manifest.notes) || manifest.notes.length === 0)
+  if (manifest.version !== 1 || !Array.isArray(manifest.notes) || (manifest.mode !== "folders" && manifest.notes.length === 0))
     throw new Error("发布清单为空或版本不受支持")
+  if (manifest.mode === "folders") manifest = await refreshFolderManifest(repo, manifest)
+  const full = manifest.mode === "folders"
   const outputs = new Set(["index"])
   const sources = new Set()
   const changes = []
@@ -171,8 +233,11 @@ export async function prepare(repo = root) {
     const parsed = matter(raw.replace(/^\uFEFF/, ""))
     if (parsed.data.draft === true || parsed.data.publish === false)
       throw new Error(`笔记明确禁止发布: ${entry.source}`)
-    const body = compatibleMath(transformBody(parsed.content, entry.source, manifest.notes, changes, assets))
-    if (body.trim().length < 150) throw new Error(`笔记正文过短: ${entry.source}`)
+    let body = full ? normalizeDisplayMath(parsed.content) : parsed.content
+    body = compatibleMath(transformBody(body, entry.source, manifest.notes, changes, assets, full))
+    if (full) body = preserveUnrenderableMath(body, entry.source, changes)
+    if (full && !body.trim()) body = "这篇笔记目前尚无正文。\n"
+    if (!full && body.trim().length < 150) throw new Error(`笔记正文过短: ${entry.source}`)
     const history = spawnSync(
       "git",
       ["-C", repo, "log", "-1", "--format=%cI", "--", "content/" + entry.source],
@@ -210,12 +275,13 @@ export async function prepare(repo = root) {
     articles: manifest.notes.length,
     pages: manifest.notes.length + 1,
     assets: assets.length,
-    unpublishedLinksConverted: changes.length,
+    unpublishedLinksConverted: changes.filter(c => !c.kind).length,
+    formulasPreservedAsText: changes.filter(c => c.kind === "formulaPreservedAsText").length,
     changes,
   }
   await fs.writeFile(path.join(repo, ".publication-report.json"), JSON.stringify(report, null, 2))
   console.log(
-    `已导出 ${report.articles} 篇文章与首页；未公开双链 ${changes.length} 处转为普通文字；配图 ${report.assets} 个。`,
+    `已导出 ${report.articles} 篇文章与首页；未公开双链 ${report.unpublishedLinksConverted} 处转为普通文字；配图 ${report.assets} 个；公式原文保留 ${report.formulasPreservedAsText} 处。`,
   )
   return report
 }

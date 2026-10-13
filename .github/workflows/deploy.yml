@@ -1,4 +1,4 @@
-name: 发布精选笔记到 GitHub Pages
+name: 发布四科学习笔记到 GitHub Pages
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
         run: npm ci
       - name: 检查发布范围
         run: node --test scripts/publication.test.mjs
-      - name: 导出公开文章
+      - name: 导出四科全部笔记
         run: node scripts/publication.mjs
       - name: 构建网站
         run: npx quartz build -d .publish-content

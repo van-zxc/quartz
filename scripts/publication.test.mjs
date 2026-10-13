@@ -7,6 +7,44 @@ import { prepare, safePath, transformBody, validateRaster, resolveTarget } from 
 import { createHash } from "node:crypto"
 import { repairHtmlAnchors } from "./repair-publication-links.mjs"
 import { compatibleMath } from "./math-compatibility.mjs"
+import { publicationFolders } from "./publication.mjs"
+import { normalizeDisplayMath, preserveUnrenderableMath } from "./full-math.mjs"
+
+test("只整理显示公式分隔符，代码和数学表达式保留", () => {
+  assert.equal(normalizeDisplayMath("$$x^2$$正文"),"\n$$\nx^2\n$$\n正文")
+  assert.equal(normalizeDisplayMath("```text\n$$x$$\n```"),"```text\n$$x$$\n```")
+  assert.equal(normalizeDisplayMath("$r$$\\iff$"),"$r$$\\iff$")
+  const changes=[]
+  const body=preserveUnrenderableMath("$\\UnknownCommand{x}$ 和 $x^2$","inbox/a.md",changes)
+  assert.ok(body.includes("`\\UnknownCommand{x}`") && body.includes("$x^2$"))
+  assert.equal(changes.length,1)
+})
+
+test("文件夹发布覆盖四科全部笔记，包括空白和草稿；其他文件夹不进入网页", async () => {
+  const dir=await fs.mkdtemp(path.join(os.tmpdir(),"quartz-folders-"))
+  try {
+    await fs.mkdir(path.join(dir,"publication"))
+    await fs.mkdir(path.join(dir,"content/attachment"),{recursive:true})
+    for (const folder of publicationFolders) {
+      await fs.mkdir(path.join(dir,"content",folder),{recursive:true})
+      await fs.writeFile(path.join(dir,"content",folder,"空白.md"),"")
+      await fs.writeFile(path.join(dir,"content",folder,"草稿.md"),"# 待补充\n\n![[未公开的外部笔记]]")
+    }
+    await fs.mkdir(path.join(dir,"content/inbox/私人"),{recursive:true})
+    await fs.writeFile(path.join(dir,"content/inbox/私人/秘密.md"),"DO_NOT_PUBLISH")
+    await fs.writeFile(path.join(dir,"publication/index.md"),"---\npublish: true\n---\n首页")
+    await fs.writeFile(path.join(dir,"publication/manifest.json"),JSON.stringify({version:1,mode:"folders",folders:publicationFolders,notes:[],assets:[]}))
+    await prepare(dir)
+    const manifest=JSON.parse(await fs.readFile(path.join(dir,"publication/manifest.json"),"utf8"))
+    assert.equal(manifest.notes.length,8)
+    assert.equal(await fs.readFile(path.join(dir,"content/inbox/数学/空白.md"),"utf8"),"")
+    assert.ok((await fs.readFile(path.join(dir,".publish-content/数学/草稿.md"),"utf8")).includes("引用：未公开的外部笔记"))
+    assert.ok((await fs.readFile(path.join(dir,".publish-content/数学/空白.md"),"utf8")).includes("尚无正文"))
+    await fs.writeFile(path.join(dir,"content/inbox/数学/新增.md"),"新增内容")
+    await prepare(dir)
+    assert.equal(JSON.parse(await fs.readFile(path.join(dir,"publication/manifest.json"),"utf8")).notes.length,9)
+  } finally {await fs.rm(dir,{recursive:true,force:true})}
+})
 
 test("旧闭合曲面积分改用等价标准符号，其他公式不改", () => {
   const legacy = String.raw`\newcommand{\oiint}{{\subset\!\supset} \mathllap{\iint}}{\oiint}`
