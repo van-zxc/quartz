@@ -33,6 +33,8 @@ jobs:
         run: node scripts/publication.mjs
       - name: 构建网站
         run: npx quartz build -d .publish-content
+      - name: 修复失效章节链接
+        run: node scripts/repair-publication-links.mjs
       - name: 检查生成结果
         run: node scripts/verify-publication.mjs
       - name: 上传网站

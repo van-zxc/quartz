@@ -1,11 +1,12 @@
 import fs from "node:fs/promises"
 import path from "node:path"
 import { root } from "./publication.mjs"
+import { publicationSlug } from "./paths.mjs"
 
 const manifest = JSON.parse(await fs.readFile(path.join(root, "publication/manifest.json"), "utf8"))
 const expected = new Set([
   "index",
-  ...manifest.notes.map((note) => note.output.slice(0, -3).replaceAll(" ", "-")),
+  ...manifest.notes.map((note) => publicationSlug(note.output)),
 ])
 const output = path.resolve(root, process.argv[2] ?? "public")
 const index = JSON.parse(await fs.readFile(path.join(output, "static/contentIndex.json"), "utf8"))
@@ -30,6 +31,10 @@ async function walk(dir) {
   }
 }
 await walk(output)
+const expectedAssets = new Set((manifest.assets ?? []).map((a) => publicationSlug(a.output)))
+const actualAssets = files.map((f) => path.relative(output, f).replaceAll(path.sep, "/")).filter((f) => f.startsWith("assets/"))
+if (actualAssets.length !== expectedAssets.size || actualAssets.some((f) => !expectedAssets.has(f)))
+  throw new Error("网站图片与发布白名单不一致")
 for (const file of files.filter((file) => file.endsWith(".html"))) {
   const relative = path.relative(output, file).replaceAll(path.sep, "/")
   const html = await fs.readFile(file, "utf8")

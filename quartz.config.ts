@@ -99,11 +99,12 @@ const config: QuartzConfig = {
         enableSiteMap: true,
         enableRSS: true,
       }),
+      Plugin.Assets(), // Only copies explicitly selected images from .publish-content.
       Plugin.Static(),
       Plugin.Favicon(),
       Plugin.NotFoundPage(),
       // Comment out CustomOgImages to speed up build time
-      // 首批文字笔记使用默认分享图，避免构建依赖外部字体服务。
+      // 精选笔记使用默认分享图，避免构建依赖外部字体服务。
     ],
   },
 }

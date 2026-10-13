@@ -3,7 +3,69 @@ import assert from "node:assert/strict"
 import fs from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
-import { prepare, safePath, transformBody } from "./publication.mjs"
+import { prepare, safePath, transformBody, validateRaster, resolveTarget } from "./publication.mjs"
+import { createHash } from "node:crypto"
+import { repairHtmlAnchors } from "./repair-publication-links.mjs"
+import { compatibleMath } from "./math-compatibility.mjs"
+
+test("旧闭合曲面积分改用等价标准符号，其他公式不改", () => {
+  const legacy = String.raw`\newcommand{\oiint}{{\subset\!\supset} \mathllap{\iint}}{\oiint}`
+  assert.equal(compatibleMath(`$$${legacy}_{S} F \\cdot dS = Q$$`),String.raw`$$\oiint_{S} F \cdot dS = Q$$`)
+  assert.equal(compatibleMath(String.raw`$x^2$ $$\int f(x)\,dx$$`),String.raw`$x^2$ $$\int f(x)\,dx$$`)
+  assert.equal(compatibleMath("`" + legacy + "`"),"`" + legacy + "`")
+})
+
+test("只允许白名单图片，公式和代码中的图名保持原样", () => {
+  const assets = [{source: "attachment/甲.png", output: "assets/abc.png"}]
+  const body = "![[甲.png|300]] `![[甲.png]]` $x+[[甲.png]]$"
+  assert.equal(transformBody(body, "inbox/a.md", [], [], assets), "![[assets/abc.png|300]] `![[甲.png]]` $x+[[甲.png]]$")
+  assert.throws(() => transformBody("![[秘密.png]]", "inbox/a.md", [], [], assets))
+  assert.throws(() => validateRaster(Buffer.from("<script>bad</script>"), "attachment/a.png"))
+  assert.throws(() => validateRaster(Buffer.from("<svg></svg>"), "attachment/a.svg"))
+})
+
+test("同名笔记先使用完整路径，歧义目标不任意连接", () => {
+  const notes = [
+    {source:"inbox/数学/甲.md",output:"数学/甲.md"},
+    {source:"inbox/物理/甲.md",output:"物理/甲.md"},
+  ]
+  assert.equal(resolveTarget("甲", "inbox/数学/乙.md", notes),notes[0])
+  assert.equal(resolveTarget("甲", "inbox/化学/乙.md", notes),undefined)
+  assert.equal(resolveTarget("物理/甲", "inbox/数学/乙.md", notes),notes[1])
+})
+
+test("仅修复已存在文章的失效锚点，不掩盖缺页或改写有效链接", () => {
+  const pages = new Map([["数学/甲.html",new Set(["定义"])]])
+  const html = '<a href="甲#定义">有效</a><a href="甲#旧标题">旧标题</a><a href="私密#定义">缺页</a>'
+  const result = repairHtmlAnchors(html,"数学/乙.html",pages)
+  assert.equal(result.html,'<a href="甲#定义">有效</a><a href="甲">旧标题</a><a href="私密#定义">缺页</a>')
+  assert.equal(result.repairs.length,1)
+})
+
+test("导出只携带核对过的图片，拒绝越界和被替换的附件", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "quartz-assets-"))
+  try {
+    await fs.mkdir(path.join(dir,"publication"))
+    await fs.mkdir(path.join(dir,"content/inbox"),{recursive:true})
+    await fs.mkdir(path.join(dir,"content/attachment"),{recursive:true})
+    const image = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1cAAAAASUVORK5CYII=","base64")
+    const asset = {source:"attachment/a.png",output:"assets/a.png",sha256:createHash("sha256").update(image).digest("hex")}
+    const manifest = {version:1,notes:[{source:"inbox/a.md",output:"数学/a.md",topic:"数学"}],assets:[asset]}
+    await fs.writeFile(path.join(dir,"content/attachment/a.png"),image)
+    await fs.writeFile(path.join(dir,"content/attachment/private.png"),"DO_NOT_PUBLISH")
+    await fs.writeFile(path.join(dir,"content/inbox/a.md"),"完整文章。".repeat(50)+"![[a.png]]")
+    await fs.writeFile(path.join(dir,"publication/index.md"),"---\npublish: true\n---\n首页")
+    const save = () => fs.writeFile(path.join(dir,"publication/manifest.json"),JSON.stringify(manifest))
+    await save(); await prepare(dir)
+    assert.deepEqual(await fs.readdir(path.join(dir,".publish-content/assets")),["a.png"])
+    assert.deepEqual(await fs.readFile(path.join(dir,".publish-content/assets/a.png")),image)
+    asset.source="attachment/../inbox/a.md"; await save()
+    await assert.rejects(prepare(dir), /不允许的发布路径/)
+    asset.source="attachment/a.png"; await save()
+    await fs.writeFile(path.join(dir,"content/attachment/a.png"),Buffer.concat([image,Buffer.from("changed")]))
+    await assert.rejects(prepare(dir),/图片发生变化/)
+  } finally {await fs.rm(dir,{recursive:true,force:true})}
+})
 
 test("拒绝目录越界、私密目录和隐藏文件", () => {
   for (const name of [
