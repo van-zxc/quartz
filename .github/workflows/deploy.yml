@@ -2,9 +2,9 @@ name: 发布精选笔记到 GitHub Pages
 
 on:
   push:
-    branches: [v4]
+    branches: [main]
   pull_request:
-    branches: [v4]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -42,7 +42,7 @@ jobs:
           path: public
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/v4'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     permissions:

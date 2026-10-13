@@ -1,18 +1,9 @@
-# Quartz v4
+# 我的大学知识库
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+大学期间的数学、物理、化学与生物学习笔记，使用 Quartz 4.5.1 构建，通过 GitHub Actions 发布到 [网站](https://van-zxc.github.io/quartz/)。
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
-Quartz v4 features a from-the-ground rewrite focusing on end-user extensibility and ease-of-use.
+首批发布16篇文字笔记，按学科分类，支持搜索、公式、目录与双向链接。公开文章由 [发布清单](publication/manifest.json) 逐篇指定；`content/inbox` 的其他内容不会自动进入网页，原稿也不会因网页导出而改写。
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+当前开发和发布统一使用 `main`。每次推送会检查公开范围、生成精选文章、构建网站、检查链接及公式，然后部署。拉取请求只验证构建。
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
-
-## Sponsors
-
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+构建、增加文章和维护流程见 [网站发布说明](publication/README.md)。本项目沿用 [Quartz](https://github.com/jackyzha0/quartz) 的代码及其 [许可证](LICENSE.txt)。

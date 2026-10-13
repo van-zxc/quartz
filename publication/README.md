@@ -23,8 +23,8 @@ node scripts/verify-publication.mjs
 ## GitHub 设置与上线
 
 1. 仓库 Settings → Pages → Build and deployment → Source 选择 GitHub Actions。Custom domain 留空，使用默认网址。
-2. Settings → Environments → github-pages，核对 Deployment branches and tags，允许发布分支 `v4`。如有其他审批规则，保留并按规则审批；无需删除环境。
-3. 只提交发布文件和已选文章的改动，推送 `v4`，或在 Actions 中手动运行“发布精选笔记到 GitHub Pages”。拉取请求只执行构建和核查，不部署生产网站。
+2. Settings → Environments → github-pages，核对 Deployment branches and tags，允许发布分支 `main`。如有其他审批规则，保留并按规则审批；无需删除环境。
+3. 只提交发布文件和已选文章的改动，推送 `main`，或在 Actions 中手动运行“发布精选笔记到 GitHub Pages”。拉取请求只执行构建和核查，不部署生产网站。
 4. 确认 build 和 deploy 均成功，再访问默认网址，检查首页、搜索、文章链接和公式。
 
 ## 后续维护
