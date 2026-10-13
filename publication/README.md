@@ -36,13 +36,13 @@ node scripts/verify-publication.mjs
 
 ## 每日自动更新
 
-每天北京时间09:15，当前聊天的自动任务运行 `node scripts/sync-publication.mjs`，读取本机四科笔记及引用配图，先构建和核查，再窄范围提交并推送。有内容变化才生成提交，推送后 GitHub Actions 自动部署。没有变化时不会生成空提交。GitHub 另在每天北京时间09:45定时构建已经上传的内容，作为独立的云端更新流程。
+Windows 任务计划程序每天北京时间09:15运行本地部署入口 `deployment/run-daily-publication.mjs`，读取四科笔记及引用配图，先构建和核查，再窄范围提交并推送。有内容变化才生成提交，推送后 GitHub Actions 自动部署；无变化时不会生成空提交。GitHub 另在每天北京时间09:45构建已经上传的内容。
 
-本地同步需要电脑开机、网络可用，且 Codex 桌面应用保持运行。GitHub 无法直接读取本机 `E:\ObsidianVaults`；电脑或应用关闭时，云端定时构建只能使用已经推送的笔记。公开仓库长期无活动时，GitHub 可能停用定时构建，届时在 Actions 中重新启用。
+所有本地部署文件均保存在 `E:\ObsidianVaults`，不需要运行 Codex。电脑需要开机、联网并登录 Windows，可以锁屏；错过时间后在可运行时补执行。GitHub 无法读取本机尚未上传的笔记。公开仓库长期无活动时，GitHub 可能停用定时构建，届时在 Actions 中重新启用。
 
-脚本只同步四科目录中的 Markdown 笔记（包含已发生的删除）、正文引用的图片，以及生成的发布清单。其他资料不会自动加入提交。暂存区非空、分支分叉、已有待推送提交越界、构建失败或文件在构建期间被编辑时，脚本停止并保留现场。
+脚本只同步四科目录中的 Markdown 笔记（包含已发生的删除）、正文引用的图片，以及生成的发布清单。暂存区非空、分支分叉、已有待推送提交越界、构建失败或文件在构建期间被编辑时，脚本停止并保留现场。
 
-手动执行一次：`node scripts/sync-publication.mjs`。仅检查不提交：`node scripts/sync-publication.mjs --check`。自动任务及运行结果可在应用的“定时任务”中查看、调整或暂停；同步成功后可在 GitHub Actions 查看部署结果。
+安装、调整时间、手动运行及日志说明见 [本地每日发布](../deployment/README.md)。任务名称为 `ObsidianVaults-DailyPublish`，运行记录位于 `deployment/local/latest.log` 和 `deployment/local/latest-status.json`；本机配置和日志不上传。仅检查不提交可运行 `node scripts/sync-publication.mjs --check`。
 
 ## 后续维护
 
