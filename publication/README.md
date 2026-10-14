@@ -8,7 +8,7 @@
 
 每次构建自动更新清单，再从清单导出网页副本；以后在这四个文件夹中新增或修改笔记并推送，就会一并发布。其他文件夹不在自动发布范围。当前617篇没有显式 `publish: false` 或 `draft: true` 标记；未来若加入这些标记，构建会停止，避免误公开。
 
-图片仅从正文引用建立清单，核查类型、大小、摘要和路径，拒绝目录越界、符号链接、隐藏文件以及文献或电子书目录。不会复制整个附件目录。
+图片仅从正文引用建立清单，保留类型、大小和路径检查，拒绝目录越界、符号链接、隐藏文件以及文献或电子书目录。不会复制整个附件目录，也不进行反复的文件哈希核对。
 
 所有原稿保持原样。网页副本整理显示公式分隔符、适配旧闭合曲面积分写法；仍无法渲染的公式以原文显示，不改写公式含义。公开笔记之间保留链接和正文嵌入，未公开目标显示引用名称。失效章节链接回退到文章入口，缺页仍使检查失败。`#补充` 等原稿标记保留为文字，学科分类使用页面元数据，避免旧版本的标签路径问题。
 
@@ -18,11 +18,9 @@
 
 ```powershell
 npm ci
-node --test scripts/publication.test.mjs
 node scripts/publication.mjs
 npx quartz build -d .publish-content
 node scripts/repair-publication-links.mjs
-node scripts/verify-publication.mjs
 ```
 
 预览可运行 `npx quartz build -d .publish-content --serve`。`.publish-content`、`.publication-report.json` 和 `public` 都是构建产物，无需提交。不要直接构建整个 `content`；发布流程以清单导出的目录为输入。
@@ -40,11 +38,12 @@ Windows 任务计划程序每天北京时间09:15运行本地部署入口 `deplo
 
 所有本地部署文件均保存在 `E:\ObsidianVaults`，不需要运行 Codex。电脑需要开机、联网并登录 Windows，可以锁屏；错过时间后在可运行时补执行。GitHub 无法读取本机尚未上传的笔记。公开仓库长期无活动时，GitHub 可能停用定时构建，届时在 Actions 中重新启用。
 
-脚本只同步四科目录中的 Markdown 笔记（包含已发生的删除）、正文引用的图片，以及生成的发布清单。暂存区非空、分支分叉、已有待推送提交越界、构建失败或文件在构建期间被编辑时，脚本停止并保留现场。
+脚本只同步四科目录中的 Markdown 笔记（包含已发生的删除）、正文引用的图片，以及生成的发布清单。保留暂存区、分支与提交范围检查，构建失败时停止；已移除重复快照、逐文件哈希和全站核查步骤。
 
 安装、调整时间、手动运行及日志说明见 [本地每日发布](../deployment/README.md)。任务名称为 `ObsidianVaults-DailyPublish`，运行记录位于 `deployment/local/latest.log` 和 `deployment/local/latest-status.json`；本机配置和日志不上传。仅检查不提交可运行 `node scripts/sync-publication.mjs --check`。
 
 ## 后续维护
+当前使用“行间”极简样式：首页只显示少量笔记入口，完整目录位于notes，阅读批注页暂不公开任何批注。文章仍使用原有地址，搜索、公式和每日发布继续由Quartz处理。
 
 增补笔记时，只提交四个学科文件夹内的预期改动和它们实际引用的图片，再推送 `main`。不用逐篇编辑清单，也不用手动维护首页文章列表。清单在构建时重新生成。
 

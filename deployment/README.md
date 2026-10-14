@@ -27,4 +27,4 @@ Get-ScheduledTaskInfo -TaskName 'ObsidianVaults-DailyPublish'
 Get-Content -LiteralPath 'E:\ObsidianVaults\deployment\local\latest-status.json'
 ```
 
-退出码0表示完成，`unchanged` 表示本地内容没有变化，`pushed` 表示已上传并触发部署；可在[部署记录](https://github.com/van-zxc/quartz/actions)核对后续构建和上线。非零退出码时查看日志；暂存区已有内容、分支冲突或笔记在构建期间被编辑时，同步会停止并保留现场。处理后手动运行即可。停用任务可执行 `Disable-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish'`；恢复使用 `Enable-ScheduledTask`，删除使用 `Unregister-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish' -Confirm:$false`。
+退出码0表示完成，`unchanged` 表示本地内容没有变化，`pushed` 表示已上传并触发部署；可在[部署记录](https://github.com/van-zxc/quartz/actions)核对后续构建和上线。非零退出码时查看日志；暂存区已有内容、分支冲突或构建失败时，同步会停止并保留现场。处理后手动运行即可。停用任务可执行 `Disable-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish'`；恢复使用 `Enable-ScheduledTask`，删除使用 `Unregister-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish' -Confirm:$false`。

@@ -1,5 +1,7 @@
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
+import { SiteBody } from "./quartz/components/MinimalBlog"
+import { MinimalPages } from "./quartz/plugins/emitters/minimalPages"
 
 /**
  * Quartz 4 Configuration
@@ -8,10 +10,10 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "我的大学知识库",
+    pageTitle: "行间",
     pageTitleSuffix: "",
     enableSPA: true,
-    enablePopovers: true,
+    enablePopovers: false,
     analytics: null,
     locale: "zh-CN",
     baseUrl: "van-zxc.github.io/quartz",
@@ -35,34 +37,34 @@ const config: QuartzConfig = {
     ],
     defaultDateType: "modified",
     theme: {
-      fontOrigin: "googleFonts",
+      fontOrigin: "local",
       cdnCaching: true,
       typography: {
-        header: "Schibsted Grotesk",
-        body: "Source Sans Pro",
-        code: "IBM Plex Mono",
+        header: "Noto Serif SC",
+        body: "Microsoft YaHei",
+        code: "Consolas",
       },
       colors: {
         lightMode: {
-          light: "#faf8f8",
-          lightgray: "#e5e5e5",
-          gray: "#b8b8b8",
-          darkgray: "#4e4e4e",
-          dark: "#2b2b2b",
-          secondary: "#284b63",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
+          light: "#faf9f6",
+          lightgray: "#e5e3dc",
+          gray: "#6d6c66",
+          darkgray: "#33312f",
+          dark: "#33312f",
+          secondary: "#67464f",
+          tertiary: "#56634f",
+          highlight: "rgba(103, 70, 79, 0.06)",
           textHighlight: "#fff23688",
         },
         darkMode: {
-          light: "#161618",
-          lightgray: "#393639",
-          gray: "#646464",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
-          secondary: "#7b97aa",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
+          light: "#232422",
+          lightgray: "#3c3e38",
+          gray: "#afaea6",
+          darkgray: "#e4e3dc",
+          dark: "#e4e3dc",
+          secondary: "#d3aeb8",
+          tertiary: "#56634f",
+          highlight: "rgba(103, 70, 79, 0.06)",
           textHighlight: "#b3aa0288",
         },
       },
@@ -92,7 +94,8 @@ const config: QuartzConfig = {
     emitters: [
       Plugin.AliasRedirects(),
       Plugin.ComponentResources(),
-      Plugin.ContentPage(),
+      Plugin.ContentPage({ pageBody: SiteBody }),
+      MinimalPages(),
       Plugin.FolderPage(),
       Plugin.TagPage(),
       Plugin.ContentIndex({

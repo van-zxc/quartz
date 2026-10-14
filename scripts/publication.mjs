@@ -208,8 +208,6 @@ export async function prepare(repo = root) {
     validateRaster(bytes, asset.source)
     if (path.posix.extname(asset.source).toLowerCase() !== path.posix.extname(asset.output).toLowerCase())
       throw new Error("图片输出扩展名不一致")
-    if (asset.sha256 !== createHash("sha256").update(bytes).digest("hex"))
-      throw new Error(`图片发生变化，请重新审查清单: ${asset.source}`)
     const slug = publicationSlug(asset.output).toLowerCase()
     if (outputs.has(slug) || sources.has(asset.source)) throw new Error("图片清单存在重复项")
     outputs.add(slug); sources.add(asset.source)

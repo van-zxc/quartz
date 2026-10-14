@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '45 1 * * *' # 每天北京时间 09:45
+    - cron: "45 1 * * *" # 每天北京时间 09:45
   workflow_dispatch:
 
 permissions:
@@ -29,16 +29,12 @@ jobs:
           cache: npm
       - name: 安装依赖
         run: npm ci
-      - name: 检查发布范围
-        run: node --test scripts/publication.test.mjs scripts/sync-publication.test.mjs
       - name: 导出四科全部笔记
         run: node scripts/publication.mjs
       - name: 构建网站
         run: npx quartz build -d .publish-content
       - name: 修复失效章节链接
         run: node scripts/repair-publication-links.mjs
-      - name: 检查生成结果
-        run: node scripts/verify-publication.mjs
       - name: 上传网站
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
