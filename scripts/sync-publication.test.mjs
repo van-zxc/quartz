@@ -65,28 +65,34 @@ test("真实提交和推送仅包含四科笔记、引用配图、清单和已�
   } finally {await f.cleanup()}
 })
 
-test("已有暂存内容时不提交、不推送、不重置暂存区",async()=>{
+test("手动暂存不阻塞发布，私有文件的暂存版本和工作区修改均保留",async()=>{
   const f=await fixture()
   try {
     await fs.writeFile(path.join(f.repo,"content/private.md"),"用户暂存内容")
     git(f.repo,"add","content/private.md")
-    const before=git(f.repo,"rev-parse","HEAD")
-    await assert.rejects(syncPublication(f),/暂存区已有改动/)
-    assert.equal(git(f.repo,"rev-parse","HEAD"),before)
-    assert.equal(git(f.origin,"rev-parse","main"),before)
+    await fs.writeFile(path.join(f.repo,"content/private.md"),"尚未暂存的私人修改")
+    await fs.writeFile(path.join(f.repo,f.existing),"公开笔记的暂存版本")
+    git(f.repo,"add",f.existing)
+    await fs.writeFile(path.join(f.repo,f.existing),"公开笔记的最新版本")
+    assert.equal((await syncPublication(f)).status,"pushed")
+    assert.equal(git(f.origin,"show","main:"+f.existing),"公开笔记的最新版本")
+    assert.equal(git(f.origin,"show","main:content/private.md"),"私人原稿")
     assert.equal(git(f.repo,"show",":content/private.md"),"用户暂存内容")
+    assert.equal(await fs.readFile(path.join(f.repo,"content/private.md"),"utf8"),"尚未暂存的私人修改")
+    assert.equal(git(f.repo,"diff","--cached","--name-only"),"content/private.md")
+    assert.equal((await syncPublication(f)).status,"unchanged")
   } finally {await f.cleanup()}
 })
 
-test("网站验证失败或构建期间笔记变化时不上传",async()=>{
+test("网站构建失败时不提交、不推送，并保留原有暂存内容",async()=>{
   const f=await fixture()
   try {
     const before=git(f.repo,"rev-parse","HEAD")
+    await fs.writeFile(path.join(f.repo,"content/private.md"),"用户暂存内容")
+    git(f.repo,"add","content/private.md")
     await assert.rejects(syncPublication({...f,validateFn:async()=>{throw Error("验证失败")}}),/验证失败/)
-    await assert.rejects(syncPublication({...f,prepareFn:async()=>{await f.save();await fs.writeFile(path.join(f.repo,f.existing),"导出期间的并发修改")}}),/导出期间发生变化/)
-    await assert.rejects(syncPublication({...f,validateFn:async()=>fs.writeFile(path.join(f.repo,f.existing),"编辑器的并发修改")}),/构建期间发生变化/)
     assert.equal(git(f.origin,"rev-parse","main"),before)
-    assert.equal(git(f.repo,"diff","--cached","--name-only"),"")
+    assert.equal(git(f.repo,"show",":content/private.md"),"用户暂存内容")
   } finally {await f.cleanup()}
 })
 

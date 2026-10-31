@@ -9,11 +9,11 @@ import { prepare, root, publicationFolders } from "./publication.mjs"
 const expectedOrigin = "git@github.com:van-zxc/quartz.git"
 const manifestPath = "publication/manifest.json"
 
-function run(repo, args, { binary = false } = {}) {
-  const result = spawnSync("git", ["-C", repo, ...args], {
+function run(repo, args, { binary = false, index } = {}) {
+  const result = spawnSync("git", ["-C", repo, "-c", "url.https://github.com/.insteadOf=git@github.com:", ...args], {
     encoding: binary ? undefined : "utf8",
     windowsHide: true,
-    env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
+    env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GCM_INTERACTIVE: "Never", ...(index ? { GIT_INDEX_FILE: index } : {}) },
     maxBuffer: 16 * 1024 * 1024,
   })
   if (result.error || result.status !== 0)
@@ -23,8 +23,8 @@ function run(repo, args, { binary = false } = {}) {
   return binary ? result.stdout : result.stdout.trim()
 }
 const splitPaths = (value) => value.toString("utf8").split("\0").filter(Boolean)
-const changed = (repo) =>
-  splitPaths(run(repo, ["diff", "--cached", "--name-only", "-z"], { binary: true }))
+const changed = (repo, index) =>
+  splitPaths(run(repo, ["diff", "--cached", "--name-only", "-z"], { binary: true, index }))
 const isNote = (name) =>
   publicationFolders.some((folder) => name.startsWith("content/" + folder + "/")) &&
   name.endsWith(".md")
@@ -89,12 +89,12 @@ export async function syncPublication({
 } = {}) {
   repo = path.resolve(repo)
   const unlock = await acquireLock(repo)
+  let index
   try {
     if (run(repo, ["branch", "--show-current"]) !== "main")
       throw new Error("自动同步只在 main 分支执行")
     if (run(repo, ["remote", "get-url", "origin"]) !== origin)
       throw new Error("远程仓库与预期不一致")
-    if (changed(repo).length) throw new Error("暂存区已有改动，保留这些改动并停止同步")
     const gitDir = run(repo, ["rev-parse", "--absolute-git-dir"])
     for (const name of ["MERGE_HEAD", "CHERRY_PICK_HEAD", "rebase-merge", "rebase-apply"])
       if (await fs.stat(path.join(gitDir, name)).catch(() => null))
@@ -147,7 +147,6 @@ export async function syncPublication({
         throw new Error("待推送提交包含发布范围以外的文件，停止自动推送")
     }
     await validateFn(repo)
-    if (changed(repo).length) throw new Error("构建期间暂存区发生变化，停止同步")
     if (check)
       return {
         status: "checked",
@@ -156,19 +155,25 @@ export async function syncPublication({
         pendingCommits: pending.length,
       }
     const list = path.join(gitDir, "quartz-publication-sync.paths")
+    // 独立暂存区只收集公开文件，其他手动暂存内容保持原样。
+    index = path.join(gitDir, `quartz-publication-${randomUUID()}.index`)
+    run(repo, ["read-tree", "HEAD"], { index })
     await fs.writeFile(list, Buffer.from(paths.join("\0") + "\0", "utf8"))
+    let staged
+    let committed = false
     try {
-      run(repo, ["add", "--force", `--pathspec-from-file=${list}`, "--pathspec-file-nul"])
+      run(repo, ["add", "--force", `--pathspec-from-file=${list}`, "--pathspec-file-nul"], { index })
+      staged = changed(repo, index)
+      if (staged.some((n) => !allowed.has(n))) throw new Error("暂存范围异常，停止提交")
+      if (staged.length) {
+        const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Shanghai" }).format(new Date())
+        run(repo, ["commit", "-m", `自动同步四科笔记 ${day}`], { index })
+        committed = true
+        // 只更新已发布文件的索引，保留其他文件的部分暂存和工作区修改。
+        run(repo, ["reset", "--quiet", "HEAD", `--pathspec-from-file=${list}`, "--pathspec-file-nul"])
+      }
     } finally {
       await fs.unlink(list)
-    }
-    const staged = changed(repo)
-    if (staged.some((n) => !allowed.has(n))) throw new Error("暂存范围异常，停止提交并保留现场")
-    let committed = false
-    if (staged.length) {
-      const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Shanghai" }).format(new Date())
-      run(repo, ["commit", "-m", `自动同步四科笔记 ${day}`])
-      committed = true
     }
     if (committed || pending.length) run(repo, ["push", "origin", "main"])
     return {
@@ -179,6 +184,7 @@ export async function syncPublication({
       commit: run(repo, ["rev-parse", "HEAD"]),
     }
   } finally {
+    if (index) await fs.rm(index, { force: true })
     await unlock()
   }
 }

@@ -2,9 +2,9 @@
 
 部署文件全部保存在 `E:\ObsidianVaults`。Windows 任务计划程序每天本机时间09:15运行，无需启动 Codex、Obsidian 或浏览器。本机使用北京时间；时区改变后按新的本机时间执行。电脑需要开机、联网并登录 Windows，可以锁屏。错过时间后会在可运行时补执行；失败后每隔10分钟重试，最多3次，同一时间只运行一个任务。
 
-`run-daily-publication.mjs` 是定时启动入口，调用仓库已有的 `scripts/sync-publication.mjs`。它更新四科笔记及实际引用的图片，构建检查通过后提交并推送；有变化才提交，GitHub Actions 收到推送后部署。GitHub 每天北京时间09:45另构建已上传的内容，不能读取尚未同步的本地文件。
+`run-daily-publication.mjs` 是定时启动入口，调用仓库已有的 `scripts/sync-publication.mjs`。它更新四科笔记及实际引用的图片，构建检查通过后提交并推送；有变化才提交，GitHub Actions 收到推送后部署。整个过程由本地程序独立运行，不依赖 Codex。发布使用独立暂存区，四科笔记即使已经手动暂存也会按最新保存内容发布，其他文件的暂存和修改保留。GitHub 每天北京时间09:45另构建已上传的内容，不能读取尚未同步的本地文件。
 
-`install-daily-publication.ps1` 安装或调整 Windows 任务 `ObsidianVaults-DailyPublish`，使用当前登录用户的普通权限和现有 Git 身份，不保存账户密码。依赖已安装的 Node.js、Git、仓库的 `node_modules` 和当前用户可用的 GitHub SSH 身份。迁移电脑或路径后重新安装；缺少依赖时先在仓库执行 `npm ci`。
+`install-daily-publication.ps1` 安装或调整 Windows 任务 `ObsidianVaults-DailyPublish`，使用当前登录用户的普通权限和现有 Git 身份，不保存账户密码。依赖已安装的 Node.js、Git、仓库的 `node_modules` 和当前用户凭据管理器中已登录的 GitHub 身份。程序通过 HTTPS 非交互式推送，避开 SSH 连接不稳定的问题；仓库的远端地址保持原样。迁移电脑或路径后重新安装；缺少依赖时先在仓库执行 `npm ci`。
 
 在 PowerShell 中安装或调整时间：
 
@@ -27,4 +27,4 @@ Get-ScheduledTaskInfo -TaskName 'ObsidianVaults-DailyPublish'
 Get-Content -LiteralPath 'E:\ObsidianVaults\deployment\local\latest-status.json'
 ```
 
-退出码0表示完成，`unchanged` 表示本地内容没有变化，`pushed` 表示已上传并触发部署；可在[部署记录](https://github.com/van-zxc/quartz/actions)核对后续构建和上线。非零退出码时查看日志；暂存区已有内容、分支冲突或构建失败时，同步会停止并保留现场。处理后手动运行即可。停用任务可执行 `Disable-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish'`；恢复使用 `Enable-ScheduledTask`，删除使用 `Unregister-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish' -Confirm:$false`。
+退出码0表示完成，`unchanged` 表示本地内容没有变化，`pushed` 表示已上传并触发部署；可在[部署记录](https://github.com/van-zxc/quartz/actions)核对后续构建和上线。非零退出码时查看日志；分支冲突、网络连接失败或构建失败时，同步会停止并保留现场，网络恢复后下次运行会重试待推送的公开笔记提交。停用任务可执行 `Disable-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish'`；恢复使用 `Enable-ScheduledTask`，删除使用 `Unregister-ScheduledTask -TaskName 'ObsidianVaults-DailyPublish' -Confirm:$false`。
