@@ -10,7 +10,9 @@ const expectedOrigin = "git@github.com:van-zxc/quartz.git"
 const manifestPath = "publication/manifest.json"
 
 function run(repo, args, { binary = false, index } = {}) {
-  const result = spawnSync("git", ["-C", repo, "-c", "url.https://github.com/.insteadOf=git@github.com:", ...args], {
+  const transport = ["fetch", "push"].includes(args[0])
+    ? ["-c", "url.https://github.com/.insteadOf=git@github.com:"] : []
+  const result = spawnSync("git", ["-C", repo, ...transport, ...args], {
     encoding: binary ? undefined : "utf8",
     windowsHide: true,
     env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GCM_INTERACTIVE: "Never", ...(index ? { GIT_INDEX_FILE: index } : {}) },
