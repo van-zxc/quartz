@@ -2225,6 +2225,11 @@
       "topic": "物理"
     },
     {
+      "source": "inbox/生物科学/self_discovery/果蝇protocol.md",
+      "output": "生物科学/self_discovery/果蝇protocol.md",
+      "topic": "生物科学"
+    },
+    {
       "source": "inbox/生物科学/self_discovery/阿斯加德古菌与真核细胞起源.md",
       "output": "生物科学/self_discovery/阿斯加德古菌与真核细胞起源.md",
       "topic": "生物科学"
@@ -2430,6 +2435,11 @@
       "topic": "生物科学"
     },
     {
+      "source": "inbox/生物科学/微生物学/微生物营养.md",
+      "output": "生物科学/微生物学/微生物营养.md",
+      "topic": "生物科学"
+    },
+    {
       "source": "inbox/生物科学/微生物学/放线菌.md",
       "output": "生物科学/微生物学/放线菌.md",
       "topic": "生物科学"
@@ -2467,6 +2477,11 @@
     {
       "source": "inbox/生物科学/生物信息学/双序列比对.md",
       "output": "生物科学/生物信息学/双序列比对.md",
+      "topic": "生物科学"
+    },
+    {
+      "source": "inbox/生物科学/生物信息学/基因组分析.md",
+      "output": "生物科学/生物信息学/基因组分析.md",
       "topic": "生物科学"
     },
     {
@@ -3077,6 +3092,11 @@
     {
       "source": "inbox/生物科学/遗传学/基因突变.md",
       "output": "生物科学/遗传学/基因突变.md",
+      "topic": "生物科学"
+    },
+    {
+      "source": "inbox/生物科学/遗传学/基因组.md",
+      "output": "生物科学/遗传学/基因组.md",
       "topic": "生物科学"
     },
     {
@@ -5540,6 +5560,31 @@
       "source": "attachment/PixPin_2026-10-19_23-15-44.png",
       "output": "assets/9a2dc231ef51a784.png",
       "sha256": "2f6c1105e3de1deefddbc1ba9f31db6265e613a9037e22deddd34491e4ae5e6c"
+    },
+    {
+      "source": "attachment/PixPin_2026-10-26_10-18-33.png",
+      "output": "assets/2d04ef84d9aa1d8d.png",
+      "sha256": "458ddfd7c1e413dc2dbf86f85bf3c277db4a2a86f9984cf546b98a3bfc0bbd70"
+    },
+    {
+      "source": "attachment/PixPin_2026-10-26_10-21-49.png",
+      "output": "assets/bf7743ca949797f4.png",
+      "sha256": "5352d56c2bb70168201584a27eff6c28b782e1b575c7c37c64fdce1c60e395a4"
+    },
+    {
+      "source": "attachment/PixPin_2026-10-26_10-31-24.png",
+      "output": "assets/9961bbb9cb69b4ff.png",
+      "sha256": "e4fbe95fc5cb2361c3ccb387a264c34b6b37ae8e30d54b50be52ab7c2f1c1519"
+    },
+    {
+      "source": "attachment/PixPin_2026-10-26_10-51-43.png",
+      "output": "assets/60e9bf2f542b3a57.png",
+      "sha256": "195d6543e0e656c5df3a26a16488e43f9918a817f366bf8268bd5270d2994ea5"
+    },
+    {
+      "source": "attachment/PixPin_2026-10-28_22-51-14.png",
+      "output": "assets/d15cabfcc57ac988.png",
+      "sha256": "679dcbbd54d0d7b0f44b6175ce43950f0c15e05646c890a730b4d4cffa36cf79"
     },
     {
       "source": "attachment/Screenshot_2024-12-23-16-50-25-195_com.jideos.jnotes-edit.jpg",
