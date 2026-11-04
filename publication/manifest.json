@@ -2435,6 +2435,11 @@
       "topic": "生物科学"
     },
     {
+      "source": "inbox/生物科学/微生物学/微生物的新陈代谢.md",
+      "output": "生物科学/微生物学/微生物的新陈代谢.md",
+      "topic": "生物科学"
+    },
+    {
       "source": "inbox/生物科学/微生物学/微生物营养.md",
       "output": "生物科学/微生物学/微生物营养.md",
       "topic": "生物科学"
@@ -5590,6 +5595,61 @@
       "source": "attachment/PixPin_2026-10-28_22-51-14.png",
       "output": "assets/d15cabfcc57ac988.png",
       "sha256": "679dcbbd54d0d7b0f44b6175ce43950f0c15e05646c890a730b4d4cffa36cf79"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_10-10-53.png",
+      "output": "assets/5d8e00dec804f4d3.png",
+      "sha256": "dfd7e6e0a2a7e8d18357bfd4d3827f2f4302aeb04608ea334c548cc0ef5d77d1"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_10-15-28.png",
+      "output": "assets/8aeb1a441d1371eb.png",
+      "sha256": "c9b81b65da31c514a770fbbefbd30dde5cb18c8bf6232c8054fe63f0d206bfcb"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_10-21-40.png",
+      "output": "assets/1aca13a85d14d685.png",
+      "sha256": "3e7508a228a257853f38ac6ecee6dc8bcd7d02d44e9fb37c431a213afb18e157"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_11-12-45.png",
+      "output": "assets/becba4c4ac6e646f.png",
+      "sha256": "693c4b933edd498b76a7f2c2350f33b640e3c1df0e4a5c5091cc01ff9ba7ea10"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_11-21-43.png",
+      "output": "assets/a781b455ec7598dd.png",
+      "sha256": "bb3330f8f9e0901fc0d129649d9dfc2ef24006f75a361bd46a7e00ac9641a420"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_12-05-10.png",
+      "output": "assets/7f64b45552eb95f7.png",
+      "sha256": "3eb8587a32fa468312a96c54c3ed3d914437e2ddbc00de39215e1c63e2849a76"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_12-06-56.png",
+      "output": "assets/9c166d0053aa4f40.png",
+      "sha256": "e96791bcd8698653afc74c84b8b9de4b044428084c45c3c115d79236561cdb66"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_12-18-53.png",
+      "output": "assets/55f1f72b89f03a4b.png",
+      "sha256": "77f8db8053ba031381d53d17987961ae763efe4aadee6a9659d938663eed5050"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_12-21-59.png",
+      "output": "assets/41e71fb3692bebf5.png",
+      "sha256": "7e0275a824dce54c999ff2eb2f154ff6253e312fa2a22858491a9e60d968c8ca"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_12-22-59.png",
+      "output": "assets/a7dc5142b5b05317.png",
+      "sha256": "7c269f68e7652afc26f132552919d388fd625ffc9fa8b9025556da25ae34c291"
+    },
+    {
+      "source": "attachment/PixPin_2026-11-02_12-25-42.png",
+      "output": "assets/2f1badf23eee500d.png",
+      "sha256": "9ee438e994347e7bac4db97a85782ad9cf5c67bb0e2e3adf38cb21324b89e341"
     },
     {
       "source": "attachment/Screenshot_2024-12-23-16-50-25-195_com.jideos.jnotes-edit.jpg",
